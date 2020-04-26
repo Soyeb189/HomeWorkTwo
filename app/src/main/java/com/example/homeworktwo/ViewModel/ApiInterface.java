@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 public interface ApiInterface {
 
     @FormUrlEncoded
-    @POST("create")
+    @POST("createNew")
     Call<RegStatus> getReg(
 
             @Field("checked_value") String checked_value,

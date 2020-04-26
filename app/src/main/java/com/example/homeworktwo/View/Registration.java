@@ -31,6 +31,7 @@ public class Registration extends AppCompatActivity {
     private Button buttonReg;
     private UserDAO dao;
     private LoginData user;
+    private String name,email,phone,password,confirmPassword,image,uuid,checked_value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,70 +57,59 @@ public class Registration extends AppCompatActivity {
                     return;
                 }
 
-                String name = editTextName.getText().toString().trim();
-                String email = editTextEmail.getText().toString().trim();
-                String phone = editTextPhone.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-                String confirmPassword = editTextConfirmPassword.getText().toString().trim();
-                String image = "image";
-                String uuid = Settings.Secure.getString(getContentResolver(),
+                 name = editTextName.getText().toString().trim();
+                 email = editTextEmail.getText().toString().trim();
+                 phone = editTextPhone.getText().toString().trim();
+                 password = editTextPassword.getText().toString().trim();
+                 confirmPassword = editTextConfirmPassword.getText().toString().trim();
+                 image = "image";
+                 uuid = Settings.Secure.getString(getContentResolver(),
                         Settings.Secure.ANDROID_ID);
-                String checked_value = "0";
+                 checked_value = "0";
 
-//                user = UserDataBase.getDataBase(getApplicationContext()).getUserDao().getSelectedUser(email);
+                CompleteRegistration();
 
-                ApiInterface apiInterface2 = ApiClint.getApiClint();
-                Call<LoginData> call2 = apiInterface2.getCheckedMail(email);
-
-                call2.enqueue(new Callback<LoginData>() {
-                    @Override
-                    public void onResponse(Call<LoginData> call2, Response<LoginData> response2) {
-                        user = response2.body();
-                        if (user!=null){
-                            if (password.equals(confirmPassword)){
-
-                                ApiInterface apiInterface = ApiClint.getApiClint();
-                                Call<RegStatus> call = apiInterface.getReg(checked_value,email,image,name,password,phone,uuid);
-                                call.enqueue(new Callback<RegStatus>() {
-                                    @Override
-                                    public void onResponse(Call<RegStatus> call, Response<RegStatus> response) {
-                                        if (response.isSuccessful()){
-                                            if (response.body().getCode().equals("1")){
-                                                Toast.makeText(Registration.this, "Success", Toast.LENGTH_SHORT).show();
-                                            }else {
-                                                Toast.makeText(Registration.this, "Response failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<RegStatus> call, Throwable t) {
-                                        String message = t.getMessage();
-                                        Toast.makeText(Registration.this, message, Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                Intent moveToLogin = new Intent(Registration.this, MainActivity.class);
-                                startActivity(moveToLogin);
-                                finish();
-                            }else {
-                                Toast.makeText(Registration.this, "Password is not match", Toast.LENGTH_SHORT).show();
-                            }
-                        }else {
-                            editTextEmail.setError("Email already exists");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<LoginData> call, Throwable t) {
-
-                    }
-
-                });
 
 
             }
         });
     }
+
+    private void CompleteRegistration() {
+
+                    if (password.equals(confirmPassword)){
+
+                        ApiInterface apiInterface = ApiClint.getApiClint();
+                        Call<RegStatus> call = apiInterface.getReg(checked_value,email,image,name,password,phone,uuid);
+                        call.enqueue(new Callback<RegStatus>() {
+                            @Override
+                            public void onResponse(Call<RegStatus> call, Response<RegStatus> response) {
+                                if (response.isSuccessful()){
+                                    if (response.body().getCode().equals("1")){
+                                        Toast.makeText(Registration.this, "Success", Toast.LENGTH_SHORT).show();
+                                        Intent moveToLogin = new Intent(Registration.this, MainActivity.class);
+                                        startActivity(moveToLogin);
+                                        finish();
+                                    }else if (response.body().getCode().equals("2")){
+                                        editTextEmail.setError("Email already exists");
+                                    }else {
+                                        Toast.makeText(Registration.this, "Response failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<RegStatus> call, Throwable t) {
+                                String message = t.getMessage();
+                                Toast.makeText(Registration.this, message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }else {
+                        Toast.makeText(Registration.this, "Password is not match", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
 
     private boolean ValidateEmail(){
         String emailInput = editTextEmail.getText().toString().trim();

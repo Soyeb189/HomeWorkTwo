@@ -100,7 +100,6 @@ public class ProfileDashboard extends AppCompatActivity {
             if (loginData.getImage().equals("image")){
                 imageViewProfile.setBackgroundResource(R.drawable.user_bac);
             }else{
-
                 Bitmap image = ImageUtil.convert(loginData.getImage());
                 imageViewProfile.setImageBitmap(image);
             }

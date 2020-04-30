@@ -1,11 +1,16 @@
 package com.example.homeworktwo.ViewModel;
 
+import com.example.homeworktwo.Model.AllUser;
 import com.example.homeworktwo.Model.LoginData;
 import com.example.homeworktwo.Model.RegStatus;
+import com.example.homeworktwo.Model.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface ApiInterface {
@@ -84,5 +89,7 @@ public interface ApiInterface {
             @Field("email") String email
 
     );
+    @GET("users")
+    Call<List<AllUser>> getUser();
 
 }

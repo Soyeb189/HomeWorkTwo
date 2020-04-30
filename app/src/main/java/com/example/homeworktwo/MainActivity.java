@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import com.example.homeworktwo.Model.LoginData;
 import com.example.homeworktwo.Model.User;
+import com.example.homeworktwo.View.AdminPanel;
 import com.example.homeworktwo.View.ProfileDashboard;
 import com.example.homeworktwo.View.Registration;
 import com.example.homeworktwo.ViewModel.ApiClint;
 import com.example.homeworktwo.ViewModel.ApiInterface;
+import com.example.homeworktwo.ViewModel.InternetConnection;
 
 import java.io.Serializable;
 
@@ -109,44 +111,43 @@ public class MainActivity extends AppCompatActivity {
                 String email = editTextEmail.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
 
-                ApiInterface apiInterface = ApiClint.getApiClint();
-                Call<LoginData> call = apiInterface.getLogin(email,password);
-                call.enqueue(new Callback<LoginData>() {
-                    @Override
-                    public void onResponse(Call<LoginData> call, Response<LoginData> response) {
-                        LoginData loginData = response.body();
+                if (InternetConnection.checkConnection(MainActivity.this)){
+                    ApiInterface apiInterface = ApiClint.getApiClint();
+                    Call<LoginData> call = apiInterface.getLogin(email,password);
+                    call.enqueue(new Callback<LoginData>() {
+                        @Override
+                        public void onResponse(Call<LoginData> call, Response<LoginData> response) {
+                            LoginData loginData = response.body();
 
-                        if(response.body().getName()!=null) {
-                            String name = response.body().getName();
-                            Toast.makeText(MainActivity.this, "Success" + name, Toast.LENGTH_SHORT).show();
-                            Intent i = new Intent(MainActivity.this, ProfileDashboard.class);
-                            i.putExtra("User", (Serializable) loginData);
-                            startActivity(i);
+                            if(response.body().getName()!=null) {
+                                if (response.body().getEmail().equals("admin@admin.com")){
+                                    Intent i = new Intent(MainActivity.this, AdminPanel.class);
+                                    startActivity(i);
+                                }else {
+                                    Intent i = new Intent(MainActivity.this, ProfileDashboard.class);
+                                    i.putExtra("User", (Serializable) loginData);
+                                    startActivity(i);
+                                }
+
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<LoginData> call, Throwable t) {
-                        String message = t.getMessage();
-                        Toast.makeText(MainActivity.this, "Paaword is no matxch", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<LoginData> call, Throwable t) {
+                            String message = t.getMessage();
+                            Toast.makeText(MainActivity.this, "Paaword is no matxch", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }else {
+                    Toast.makeText(MainActivity.this, "No Internet", Toast.LENGTH_SHORT).show();
+                }
+
+
 
 //                user = dao.getUser(email,password);
 //                user = UserDataBase.getDataBase(getApplicationContext()).getUserDao().getUser(email,password);
 
-                if (user != null){
-//                    user.setCheckValue(m);
-                    user.setUuid(uuid);
-//                    UserDataBase.getDataBase(getApplicationContext()).getUserDao().updateUser(user);
-                    Intent i = new Intent(MainActivity.this, ProfileDashboard.class);
-//                    i.putExtra("User", user);
-                    startActivity(i);
 
-                }else {
-                    Toast.makeText(MainActivity.this, "Email or password is invalid", Toast.LENGTH_SHORT).show();
-
-                }
 
             }
         });

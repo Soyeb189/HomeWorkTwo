@@ -92,4 +92,12 @@ public interface ApiInterface {
     @GET("users")
     Call<List<AllUser>> getUser();
 
+    @FormUrlEncoded
+    @POST("deleteMultiple")
+    Call<RegStatus> getDeletedStatus(
+
+            @Field("ids") List<Integer> ids
+
+    );
+
 }
